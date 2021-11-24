@@ -117,6 +117,16 @@ export default class Markdown {
     return newString.join('');
   }
 
+  static normalizeUrl(url, escapeRegex = /\s/g) {
+    // Decode encoded URL characters
+    url = decodeURI(url);
+    // Encode URL characters we still want to escape
+    return url.replace(escapeRegex, (match) => {
+      // `encodeURIComponent()` misses characters like `(`, `)`
+      return `%${match.charCodeAt(0).toString(16)}`;
+    });
+  }
+
   /**
  * @param {string} title
  * @param {string} url
@@ -128,7 +138,8 @@ export default class Markdown {
     } else {
       titleToUse = this.escapeLinkText(title);
     }
-    return `[${titleToUse}](${url})`;
+    const urlToUse = this.constructor.normalizeUrl(url, /\s|[()]/g);
+    return `[${titleToUse}](${urlToUse})`;
   }
 
   static imageFor(title, url) {
