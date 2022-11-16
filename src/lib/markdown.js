@@ -77,6 +77,7 @@ export default class Markdown {
     );
 
     const newString = [];
+    const inlineChars = new Set();
 
     // using an iterator to ensure Unicode code point is considered.
     const it = text[Symbol.iterator]();
@@ -99,7 +100,11 @@ export default class Markdown {
         case '_':
         case '`':
         case '~':
-          chToUse = `\\${ch.value}`;
+          if (inlineChars.has(ch.value)) {
+            chToUse = `\\${ch.value}`;
+          } else {
+            inlineChars.add(ch.value);
+          }
           break;
 
         default:
