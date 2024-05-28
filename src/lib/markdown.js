@@ -82,6 +82,7 @@ export default class Markdown {
     // using an iterator to ensure Unicode code point is considered.
     const it = text[Symbol.iterator]();
     let ch = it.next();
+    let isFirst = true
 
     while (!ch.done) {
       let chToUse = null;
@@ -89,6 +90,10 @@ export default class Markdown {
       switch (ch.value) {
       // Potential unbalanced brackets
         case '[':
+          if (!isFirst && shouldEscapeBrackets) {
+            chToUse = `\\${ch.value}`;
+          }
+          break;
         case ']':
           if (shouldEscapeBrackets) {
             chToUse = `\\${ch.value}`;
@@ -117,6 +122,8 @@ export default class Markdown {
 
       newString.push(chToUse);
       ch = it.next();
+
+      isFirst = false
     }
 
     return newString.join('');
